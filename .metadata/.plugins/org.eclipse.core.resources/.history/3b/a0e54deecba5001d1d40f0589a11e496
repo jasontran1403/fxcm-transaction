@@ -1,0 +1,5 @@
+package com.something.authenticator;
+
+public class LssSecurityConfig {
+
+}

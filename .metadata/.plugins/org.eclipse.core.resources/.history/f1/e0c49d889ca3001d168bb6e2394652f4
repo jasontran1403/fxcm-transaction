@@ -1,0 +1,410 @@
+package com.something.service.serviceimpl;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.something.domain.Role;
+import com.something.domain.User;
+import com.something.repo.RoleRepo;
+import com.something.repo.UserRepo;
+import com.something.service.UserService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+@Slf4j
+public class UserServiceImpl implements UserService, UserDetailsService {
+	@Autowired
+	UserRepo userRepo;
+
+	@Autowired
+	RoleRepo roleRepo;
+
+	@Autowired
+	PasswordEncoder passwordEncoder;
+
+	@Override
+	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+		User user = userRepo.findByUsername(username);
+		if (user == null || user.isActived() == false) {
+			throw new UsernameNotFoundException("User is invalid, or is not active");
+		} else {
+			Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+			user.getRoles().forEach(role -> {
+				authorities.add(new SimpleGrantedAuthority(role.getName()));
+			});
+			return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(),
+					authorities);
+		}
+	}
+
+	@Override
+	public User saveUser(User user) {
+		log.info("Saving new user {} to the database", user.getName());
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		Role role = roleRepo.findByName("ROLE_ADMIN");
+		user.getRoles().add(role);
+
+		User existedUserByUsername = userRepo.findByUsername(user.getUsername());
+		if (existedUserByUsername != null) {
+			throw new RuntimeException("This username already existed");
+		}
+
+		User existedUserByEmail = userRepo.findByEmail(user.getEmail());
+		if (existedUserByEmail != null) {
+			throw new RuntimeException("This email address already existed");
+		}
+		return userRepo.save(user);
+	}
+
+	@Override
+	public User regis(User user) {
+		log.info("Saving new user {} to the database", user.getName());
+		user.setPassword(passwordEncoder.encode(user.getPassword()));
+		Role role = roleRepo.findByName("ROLE_USER");
+		user.getRoles().add(role);
+
+		User existedUserByUsername = userRepo.findByUsername(user.getUsername());
+		if (existedUserByUsername != null) {
+			throw new RuntimeException("This username already existed");
+		}
+
+		User existedUserByEmail = userRepo.findByEmail(user.getEmail());
+		if (existedUserByEmail != null) {
+			throw new RuntimeException("This email address already existed");
+		}
+		return userRepo.save(user);
+	}
+
+	@Override
+	public Role saveRole(Role role) {
+		log.info("Saving new role {} to the database", role.getName());
+		return roleRepo.save(role);
+	}
+
+	@Override
+	public void addRoleToUser(String username, String roleName) {
+		log.info("Adding role {} to user {}", roleName, username);
+		User user = userRepo.findByUsername(username);
+		Role role = roleRepo.findByName(roleName);
+		user.getRoles().add(role);
+	}
+
+	@Override
+	public User getUser(String username) {
+		log.info("Fetching user {}", username);
+		return userRepo.findByUsername(username);
+	}
+
+	@Override
+	public List<User> getUsers() {
+		log.info("Fetching all users");
+		return userRepo.findAll();
+	}
+
+	@Override
+	public User updateRef(String username, String usernameRef, String side) {
+		User user = userRepo.findByUsername(username);
+		// TODO Auto-generated method stub
+		if (user == null) {
+			throw new RuntimeException("This user doesnt exists");
+		}
+		if (side.equalsIgnoreCase("left") && user.getLeftref().equalsIgnoreCase("")) {
+			user.setLeftref(usernameRef);
+		} else if (side.equalsIgnoreCase("right") && user.getRightref().equalsIgnoreCase("")) {
+			user.setRightref(usernameRef);
+		} else {
+			throw new RuntimeException("This user already full referral");
+		}
+		return user;
+	}
+
+	@Override
+	public HashMap<String, List<User>> getMapDown(String username) {
+		// TODO Auto-generated method stub
+		HashMap<String, List<User>> userTree = new HashMap<>();
+		userTree = findMapDown(username);
+		return userTree;
+	}
+
+	public HashMap<String, List<User>> findMapDown(String username) {
+		HashMap<String, List<User>> userTreeMap = new HashMap<>();
+		List<User> listUser = new ArrayList<>();
+		User user = userRepo.findByUsername(username);
+		listUser.add(user);
+		userTreeMap.put("Root", listUser);
+
+		List<User> userTreeL1 = userRepo.findByRoot(username);
+		userTreeMap.put("L1", userTreeL1);
+
+		for (int i = 1; i < 15; i++) {
+			List<User> userTree = userTreeMap.get("L" + i);
+			if (userTree == null) {
+				break;
+			}
+			List<User> nextUserTree = new ArrayList<>();
+			for (User item : userTree) {
+				List<User> next = new ArrayList<>();
+				next = userRepo.findByRoot(item.getUsername());
+				if (next == null) {
+					continue;
+				}
+				nextUserTree.addAll(next);
+			}
+			userTreeMap.put("L" + (i + 1), nextUserTree);
+		}
+
+		return userTreeMap;
+	}
+
+	@Override
+	public List<User> getTreeUp(String username) {
+		// TODO Auto-generated method stub
+		List<User> listUser = new ArrayList<>();
+		User user = userRepo.findByUsername(username);
+		if (user == null) {
+			throw new RuntimeException("This username is not exists");
+		}
+		listUser = findTreeUp(username);
+		return listUser;
+	}
+
+	public List<User> findTreeUp(String username) {
+		List<User> listUser = new ArrayList<>();
+		User user = userRepo.findByUsername(username);
+		listUser.add(user);
+		for (int i = 1; i < 16; i++) {
+			User nextUser = userRepo.findByUsername(listUser.get(i - 1).getRootUsername());
+			if (nextUser == null || nextUser.getUsername().equalsIgnoreCase("super")) {
+				break;
+			}
+			listUser.add(nextUser);
+		}
+
+		return listUser;
+	}
+
+	@Override
+	public List<User> getTreeUpToRoot(String username) {
+		// TODO Auto-generated method stub
+		List<User> listUser = new ArrayList<>();
+		User user = userRepo.findByUsername(username);
+		if (user == null) {
+			throw new RuntimeException("This username is not exists");
+		}
+		listUser = findTreeUpToRoot(username);
+		return listUser;
+	}
+
+	public List<User> findTreeUpToRoot(String username) {
+		List<User> listUser = new ArrayList<>();
+		List<User> listAllUser = userRepo.findAll();
+		User user = userRepo.findByUsername(username);
+		listUser.add(user);
+		for (int i = 1; i < listAllUser.size(); i++) {
+			User nextUser = userRepo.findByUsername(listUser.get(i - 1).getRootUsername());
+			if (nextUser == null || nextUser.getUsername().equalsIgnoreCase("super")) {
+				break;
+			}
+			listUser.add(nextUser);
+		}
+
+		return listUser;
+	}
+
+	@Override
+	public void updateSale(String username, long sale) {
+		// TODO Auto-generated method stub
+		User user = userRepo.findByUsername(username);
+		user.setSales(user.getSales() + sale);
+		userRepo.save(user);
+	}
+
+	@Override
+	public void updateteamSale(String username, long sale) {
+		// TODO Auto-generated method stub
+		User user = userRepo.findByUsername(username);
+		user.setTeamsales(user.getTeamsales() + sale);
+		userRepo.save(user);
+	}
+
+	@Override
+	public void calRank() {
+		// TODO Auto-generated method stub
+		List<User> allUsers = userRepo.findAll();
+		for (User user : allUsers) {
+			if (user.isRanked()) {
+				continue;
+			}
+			User userLeft = userRepo.findByUsername(user.getLeftref());
+			User userRight = userRepo.findByUsername(user.getRightref());
+			if (userLeft == null || userRight == null) {
+				if (user.getSales() >= 500000) {
+					updateRank(user, 9);
+				} else if (user.getSales() >= 100000) {
+					updateRank(user, 8);
+				} else if (user.getSales() >= 50000) {
+					updateRank(user, 7);
+				} else if (user.getSales() >= 20000) {
+					updateRank(user, 6);
+				} else if (user.getSales() >= 10000) {
+					updateRank(user, 5);
+				} else if (user.getSales() >= 5000) {
+					updateRank(user, 4);
+				} else if (user.getSales() >= 2000) {
+					updateRank(user, 3);
+				} else if (user.getSales() >= 1000) {
+					updateRank(user, 2);
+				} else if (user.getSales() >= 500) {
+					updateRank(user, 1);
+				}
+			} else {
+				if (user.getSales() >= 500000
+						|| userLeft.getTeamsales() > +userRight.getTeamsales() && userRight.getTeamsales() >= 2500000
+						|| userLeft.getTeamsales() <= userRight.getTeamsales() && userLeft.getTeamsales() >= 2500000) {
+					updateRank(user, 9);
+				} else if (user.getSales() >= 100000
+						|| userLeft.getTeamsales() >= userRight.getTeamsales() && userRight.getTeamsales() >= 500000
+						|| userLeft.getTeamsales() <= userRight.getTeamsales() && userLeft.getTeamsales() >= 500000) {
+					updateRank(user, 8);
+				} else if (user.getSales() >= 50000
+						|| userLeft.getTeamsales() >= userRight.getTeamsales() && userRight.getTeamsales() >= 250000
+						|| userLeft.getTeamsales() <= userRight.getTeamsales() && userLeft.getTeamsales() >= 250000) {
+					updateRank(user, 7);
+				} else if (user.getSales() >= 20000
+						|| userLeft.getTeamsales() >= userRight.getTeamsales() && userRight.getTeamsales() >= 100000
+						|| userLeft.getTeamsales() <= userRight.getTeamsales() && userLeft.getTeamsales() >= 100000) {
+					updateRank(user, 6);
+				} else if (user.getSales() >= 10000
+						|| userLeft.getTeamsales() >= userRight.getTeamsales() && userRight.getTeamsales() >= 50000
+						|| userLeft.getTeamsales() <= userRight.getTeamsales() && userLeft.getTeamsales() >= 50000) {
+					updateRank(user, 5);
+				} else if (user.getSales() >= 5000
+						|| userLeft.getTeamsales() >= userRight.getTeamsales() && userRight.getTeamsales() >= 25000
+						|| userLeft.getTeamsales() <= userRight.getTeamsales() && userLeft.getTeamsales() >= 25000) {
+					updateRank(user, 4);
+				} else if (user.getSales() >= 2000
+						|| userLeft.getTeamsales() >= userRight.getTeamsales() && userRight.getTeamsales() >= 10000
+						|| userLeft.getTeamsales() <= userRight.getTeamsales() && userLeft.getTeamsales() >= 10000) {
+					updateRank(user, 3);
+				} else if (user.getSales() >= 1000
+						|| userLeft.getTeamsales() >= userRight.getTeamsales() && userRight.getTeamsales() >= 5000
+						|| userLeft.getTeamsales() <= userRight.getTeamsales() && userLeft.getTeamsales() >= 5000) {
+					updateRank(user, 2);
+				} else if (user.getSales() >= 500
+						|| userLeft.getTeamsales() >= userRight.getTeamsales() && userRight.getTeamsales() >= 2500
+						|| userLeft.getTeamsales() <= userRight.getTeamsales() && userLeft.getTeamsales() >= 2500) {
+					updateRank(user, 1);
+				}
+			}
+		}
+	}
+
+	public void updateRank(User user, int rank) {
+		// TODO Auto-generated method stub
+		user.setRank(rank);
+		userRepo.save(user);
+	}
+
+	@Override
+	public void updateMaxOut(User user, double amount, String type) {
+		// TODO Auto-generated method stub
+		if (type.equalsIgnoreCase("buy")) {
+			user.setMaxout(user.getMaxout() + amount * 4);
+			user.setMaxoutleft(user.getMaxoutleft() + amount * 4);
+		} else if (type.equalsIgnoreCase("receive")) {
+			user.setMaxout(user.getMaxout() + amount);
+			user.setMaxoutleft(user.getMaxoutleft() + amount);
+		} else if (type.equalsIgnoreCase("transfer") || type.equalsIgnoreCase("withdraw")
+				|| type.equalsIgnoreCase("swap")) {
+			user.setMaxoutleft(user.getMaxoutleft() - amount);
+		}
+	}
+
+	@Override
+	public HashMap<String, List<User>> getMapDown5Level(String username) {
+		// TODO Auto-generated method stub
+		HashMap<String, List<User>> userTree = new HashMap<>();
+		userTree = findMapDown5Level(username);
+		return userTree;
+	}
+
+	public HashMap<String, List<User>> findMapDown5Level(String username) {
+		HashMap<String, List<User>> userTreeMap = new HashMap<>();
+		List<User> listUser = new ArrayList<>();
+		User user = userRepo.findByUsername(username);
+		listUser.add(user);
+		userTreeMap.put("Root", listUser);
+
+		List<User> userTreeL1 = userRepo.findAllByPlacement(username);
+		if (userTreeL1.size() == 0) {
+			userTreeL1.add(new User());
+			userTreeL1.add(new User());
+		} else if (userTreeL1.size() == 1) {
+			userTreeL1.add(new User());
+		}
+		userTreeMap.put("L1", userTreeL1);
+
+		for (int i = 1; i < 5; i++) {
+			List<User> userTree = userTreeMap.get("L" + i);
+
+			List<User> nextUserTree = new ArrayList<>();
+			for (User item : userTree) {
+				List<User> next = new ArrayList<>();
+				User temp = new User();
+				if (item.getUsername() == null) {
+					for (int k = 0; k < 2; k++) {
+						User userNull = new User();
+						next.add(userNull);
+					}
+
+					nextUserTree.addAll(next);
+				} else {
+					next = userRepo.findAllByPlacement(item.getUsername());
+					if (next.size() == 0) {
+						for (int h = 0; h < 2; h++) {
+							User userNull = new User();
+							next.add(userNull);
+						}
+					} else if (next.size() == 1) {
+						if (item.getSide().equalsIgnoreCase("left")) {
+							next.add(new User());
+						} else {
+							temp = item;
+							next = new ArrayList<>();
+							next.add(new User());
+							next.add(temp);
+						}
+					}
+					System.out.println("---------------------------");
+					for (int t = 0; t < next.size(); t++) {
+						if (next.get(0) != null && next.get(0).getSide().equalsIgnoreCase("right")) {
+							System.out.println(next.get(t));
+						}
+					}
+					System.out.println("---------------------------");
+
+					nextUserTree.addAll(next);
+				}
+			}
+			userTreeMap.put("L" + (i + 1), nextUserTree);
+		}
+
+		return userTreeMap;
+	}
+}

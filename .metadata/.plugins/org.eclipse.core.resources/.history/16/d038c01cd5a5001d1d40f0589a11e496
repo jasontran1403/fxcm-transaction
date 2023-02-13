@@ -1,0 +1,13 @@
+package com.something.service;
+
+import java.io.IOException;
+
+import com.google.zxing.WriterException;
+
+public interface AuthenticatorService {
+	public String generateSecretKey();
+	public String getTOTPCode(String secretKey);
+	public String createQRCode(String barCodeData, String filePath, int height, int width)
+            throws WriterException, IOException;
+	
+}

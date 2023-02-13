@@ -1,0 +1,34 @@
+package com.something.service.serviceimpl;
+
+import org.springframework.stereotype.Service;
+import dev.samstevens.totp.code.CodeVerifier;
+
+import com.something.service.AuthenticatorService;
+
+import dev.samstevens.totp.exceptions.QrGenerationException;
+import javax.annotation.Resource;
+
+@Service
+public class AuthenticatorServiceImpl implements AuthenticatorService {
+	@Resource
+    private CodeVerifier codeVerifier;
+	
+	@Override
+    public boolean verifyTotp(String code, String secret) {
+        return codeVerifier.isValidCode(secret, code);
+    }
+
+	@Override
+	public String generateSecretKey() {
+		// TODO Auto-generated method stub
+		
+		return "OK";
+	}
+
+	@Override
+	public String getQRCode(String secret) throws QrGenerationException {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+}

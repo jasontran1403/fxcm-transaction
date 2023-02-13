@@ -1,0 +1,44 @@
+package com.something.service;
+
+import javax.annotation.Resource;
+
+import dev.samstevens.totp.code.CodeVerifier;
+import dev.samstevens.totp.code.HashingAlgorithm;
+import dev.samstevens.totp.exceptions.QrGenerationException;
+import dev.samstevens.totp.qr.QrData;
+import dev.samstevens.totp.qr.QrGenerator;
+import dev.samstevens.totp.secret.SecretGenerator;
+import dev.samstevens.totp.util.Utils;
+
+public interface MFATokenManager {
+	@Resource
+    private SecretGenerator secretGenerator;
+
+    @Resource
+    private QrGenerator qrGenerator;
+
+    @Resource
+    private CodeVerifier codeVerifier;
+
+    public static String generateSecretKey() {
+        return secretGenerator.generate();
+    }
+
+    public static String getQRCode(String secret) throws QrGenerationException {
+        QrData data = new QrData.Builder().label("MFA")
+                .secret(secret)
+                .issuer("Java Development Journal")
+                .algorithm(HashingAlgorithm.SHA256)
+                .digits(6)
+                .period(30)
+                .build();
+       return  Utils.getDataUriForImage(
+                qrGenerator.generate(data),
+                qrGenerator.getImageMimeType()
+        );
+    }
+
+    public static boolean verifyTotp(String code, String secret) {
+        return codeVerifier.isValidCode(secret, code);
+    }
+}
