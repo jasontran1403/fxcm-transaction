@@ -243,6 +243,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		user.setTeamsales(user.getTeamsales() + sale);
 		userRepo.save(user);
 	}
+	
+	@Override
+	public void updateteamSaleWithdraw(String username, long sale) {
+		// TODO Auto-generated method stub
+		User user = userRepo.findByUsername(username);
+		user.setTeamsales(user.getTeamsales() - sale);
+		userRepo.save(user);
+	}
 
 	@Override
 	public void calRank() {
@@ -255,6 +263,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 			User userLeft = userRepo.findByUsername(user.getLeftref());
 			User userRight = userRepo.findByUsername(user.getRightref());
 			if (userLeft == null || userRight == null) {
+				System.out.println(user.getSales());
 				if (user.getSales() >= 500000) {
 					updateRank(user, 9);
 				} else if (user.getSales() >= 100000) {
@@ -273,6 +282,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 					updateRank(user, 2);
 				} else if (user.getSales() >= 500) {
 					updateRank(user, 1);
+				} else {
+					updateRank(user, 0);
 				}
 			} else {
 				if (user.getSales() >= 500000
@@ -434,6 +445,26 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	public void activated(User user) {
 		// TODO Auto-generated method stub
 		user.setActived(true);
+		userRepo.save(user);
+	}
+
+	@Override
+	public User findByEmail(String email) {
+		// TODO Auto-generated method stub
+		return userRepo.findByEmail(email);
+	}
+
+	@Override
+	public void updateSaleFromWithdraw(String username, long sale) {
+		// TODO Auto-generated method stub
+		User user = userRepo.findByUsername(username);
+		user.setSales(sale);
+		userRepo.save(user);
+	}
+
+	@Override
+	public void updateSecrect(User user) {
+		// TODO Auto-generated method stub
 		userRepo.save(user);
 	}
 }

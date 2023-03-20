@@ -1,0 +1,266 @@
+package com.something;
+
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Scanner;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
+import com.something.domain.CommissionWallet;
+import com.something.domain.HistoryWallet;
+import com.something.domain.Investment;
+import com.something.domain.Pack;
+import com.something.domain.User;
+import com.something.service.CashWalletService;
+import com.something.service.CommissionWalletService;
+import com.something.service.HistoryWalletService;
+import com.something.service.InvestmentService;
+import com.something.service.PackService;
+import com.something.service.UserService;
+
+@SpringBootApplication
+@EnableScheduling
+public class UserServiceApplication {
+	@Autowired
+	InvestmentService investService;
+
+	@Autowired
+	CommissionWalletService cmwService;
+
+	@Autowired
+	CashWalletService cwService;
+
+	@Autowired
+	HistoryWalletService hwService;
+
+	@Autowired
+	PackService packService;
+
+	@Autowired
+	UserService userService;
+
+	public static void main(String[] args) throws IOException{
+		SpringApplication.run(UserServiceApplication.class, args);
+		getContentFrom("http://gamevn.com/");
+	}
+	
+	private static String getContentFrom(String link) throws IOException {
+        // Gởi HTTP request và nhận về kết quả là chuỗi các thẻ HTML
+        URL url = new URL(link);
+        Scanner scanner = new Scanner(new InputStreamReader(url.openStream()));
+        scanner.useDelimiter("\\\\Z");
+        String content = scanner.next();
+        scanner.close();
+        // xoá các ký tự ngắt dòng (xuống dòng)
+        content = content.replaceAll("\\\\R", "");
+        return content;
+    }
+
+	
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
+
+	@Scheduled(cron = "0 0/30 * * * *")
+//	@Scheduled(cron = "*/10 * * ? * *")
+//	@Scheduled(cron = "*/1 * * ? * *")
+	public void testingScheduled() {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+		LocalDateTime dateTime = LocalDateTime.now();
+		String formattedDateTime = dateTime.format(formatter);
+
+		System.out.println("Starting daily commission at: " + formattedDateTime);
+
+		List<Investment> listInvest = investService.getAllInvestment();
+		int total = 0;
+		for (Investment invest : listInvest) {
+			String forSelf = UUID.randomUUID().toString();
+			
+			total++;
+			if (invest.getCount() == 300) {
+				continue;
+			}
+			
+			CommissionWallet cmw = cmwService.findByUsername(invest.getUsername());
+			Pack pack = packService.findById(invest.getPackageId());
+
+			cmw.setBalance(cmw.getBalance() + invest.getRemain() * pack.getDaily()/100);
+			cmwService.updateBalance(cmw);
+			HistoryWallet hw = new HistoryWallet();
+			hw.setAmount(invest.getRemain() * pack.getDaily()/100);
+			hw.setTime(formattedDateTime);
+			hw.setType("Daily Commission");
+			hw.setCode(forSelf);
+			hw.setHash("");
+			hw.setStatus("success");
+			hw.setFrominvestment(invest.getCode());
+			hw.setUsername(cmw.getUsername());
+			hwService.update(hw);
+			
+			investService.updateProgress(invest.getCode());
+
+			List<User> listUser = userService.getTreeUp(invest.getUsername());
+			for (int i = 1; i < listUser.size(); i++) {
+				total++;
+				int pop = 0;
+				if (listUser.get(i).getRank() == 0) {
+					continue;
+				}
+				switch (listUser.get(i).getRank()) {
+				case 1:
+					if (i == 1) {
+						pop = 10;
+					} else if (i == 3) {
+						pop = 5;
+					} else if (i == 4) {
+						pop = 3;
+					}
+					break;
+				case 2:
+					if (i == 1) {
+						pop = 12;
+					} else if (i == 2) {
+						pop = 10;
+					} else if (i == 3) {
+						pop = 5;
+					} else if (i >= 4 && i <= 6) {
+						pop = 3;
+					}
+					break;
+				case 3:
+					if (i == 1) {
+						pop = 15;
+					} else if (i == 2) {
+						pop = 10;
+					} else if (i == 3) {
+						pop = 5;
+					} else if (i >= 4 && i <= 8) {
+						pop = 3;
+					}
+					break;
+				case 4:
+					if (i == 1) {
+						pop = 20;
+					} else if (i == 2) {
+						pop = 10;
+					} else if (i == 3) {
+						pop = 5;
+					} else if (i >= 4 && i <= 8) {
+						pop = 3;
+					} else if (i >= 9 && i <= 10) {
+						pop = 2;
+					}
+					break;
+				case 5:
+					if (i == 1) {
+						pop = 26;
+					} else if (i == 2) {
+						pop = 10;
+					} else if (i == 3) {
+						pop = 5;
+					} else if (i >= 4 && i <= 8) {
+						pop = 3;
+					} else if (i >= 9 && i <= 12) {
+						pop = 2;
+					}
+					break;
+				case 6:
+					if (i == 1) {
+						pop = 30;
+					} else if (i == 2) {
+						pop = 10;
+					} else if (i == 3) {
+						pop = 5;
+					} else if (i >= 4 && i <= 8) {
+						pop = 3;
+					} else if (i >= 9 && i <= 13) {
+						pop = 2;
+					} else if (i == 14) {
+						pop = 1;
+					}
+					break;
+				case 7:
+					if (i == 1) {
+						pop = 37;
+					} else if (i == 2) {
+						pop = 10;
+					} else if (i == 3) {
+						pop = 5;
+					} else if (i >= 4 && i <= 8) {
+						pop = 3;
+					} else if (i >= 9 && i <= 13) {
+						pop = 2;
+					} else if (i >= 14) {
+						pop = 1;
+					}
+					break;
+				case 8:
+					if (i == 1) {
+						pop = 40;
+					} else if (i == 2) {
+						pop = 10;
+					} else if (i == 3) {
+						pop = 5;
+					} else if (i >= 4 && i <= 8) {
+						pop = 3;
+					} else if (i >= 9) {
+						pop = 2;
+					}
+					break;
+				case 9:
+					if (i == 1) {
+						pop = 40;
+					} else if (i == 2) {
+						pop = 10;
+					} else if (i >= 3) {
+						pop = 5;
+					}
+					break;
+				default:
+					break;
+				}
+
+				if (pop == 0) {
+					continue;
+				}
+				String forUp = UUID.randomUUID().toString();
+				CommissionWallet cmwTreeUp = cmwService.findByUsername(listUser.get(i).getUsername());
+				cmwTreeUp.setBalance(cmwTreeUp.getBalance() + (invest.getRemain() * pack.getDaily()/100) * pop / 100);
+				cmwService.updateBalance(cmwTreeUp);
+
+				HistoryWallet hwTreeUp = new HistoryWallet();
+				hwTreeUp.setAmount((invest.getRemain() * pack.getDaily()/100) * pop / 100);
+				hwTreeUp.setTime(formattedDateTime);
+				hwTreeUp.setCashfrom(invest.getUsername());
+				hwTreeUp.setCashto(listUser.get(i).getUsername());
+				hwTreeUp.setFrominvestment(invest.getCode());
+				hwTreeUp.setCode(forUp);
+				hwTreeUp.setHash("");
+				hwTreeUp.setStatus("success");
+				hwTreeUp.setType("POP");
+				hwTreeUp.setUsername(cmwTreeUp.getUsername());
+				hwService.update(hwTreeUp);
+			}
+		}
+
+		LocalDateTime dateTimeEnd = LocalDateTime.now();
+		String formattedDateTimeEnd = dateTimeEnd.format(formatter);
+		System.out.println("Số lệnh trả: " + total);
+		System.out.println("End daily commission at: " + formattedDateTimeEnd);
+
+	}
+}

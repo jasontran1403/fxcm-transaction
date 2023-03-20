@@ -1,9 +1,0 @@
-package com.something.repo;
-
-import org.springframework.data.jpa.repository.JpaRepository;
-
-import com.something.domain.Activation;
-
-public interface ActivationRepo extends JpaRepository<Activation, String>{
-
-}

@@ -21,7 +21,7 @@ const AdminNav = () => {
                 </Link>
             </div>
 
-            <div className="flex items-center space-x-5">
+            <div className="flex items-center space-x-5 max-lg:hidden">
                 <Menu>
                     <div className="relative">
                         <Link
@@ -33,20 +33,20 @@ const AdminNav = () => {
                     </div>
                     <div className="relative">
                         <Link
-                            to={"/invest"}
-                            className="flex items-center space-x-3 px-4 py-2.5 text-sm hover:text-purple-500"
-                        >
-                            <h3>Investment</h3>
-                        </Link>
-                    </div>
-                    {/* <div className="relative">
-                        <Link
                             to={"/investment"}
                             className="flex items-center space-x-3 px-4 py-2.5 text-sm hover:text-purple-500"
                         >
                             <h3>Investment</h3>
                         </Link>
-                    </div> */}
+                    </div>
+                    <div className="relative">
+                        <Link
+                            to={"/transferexternal"}
+                            className="flex items-center space-x-3 px-4 py-2.5 text-sm hover:text-purple-500"
+                        >
+                            <h3>Transfer $</h3>
+                        </Link>
+                    </div>
                     <div className="relative">
                         <Link
                             to={"/treeview"}

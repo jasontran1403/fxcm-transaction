@@ -1,0 +1,56 @@
+package com.something.domain;
+
+import java.io.Serializable;
+import java.sql.Date;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
+public class Appraisal implements Serializable{
+	private static final long serialVersionUID = 1L;
+
+	@Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+	
+	private String address;
+	private Date time;
+	private String legal;
+	private String type;
+	private double acreageToCert;
+	private double nts;
+	private double cln;
+	private double clnvplg;
+	private double width;
+	private double height;
+	private String shape;
+	private String position;
+	private String traffic;
+	private String other;
+	private String ctxd;
+	private double priceSale;
+	private double priceNego;
+	private double priceExchange;
+	private double clnLoGioi;
+	private double totalpriceQuyenSuDung;
+	private double priceQuyenSuDung;
+	
+	@JsonIgnore
+    @OneToMany(mappedBy = "AppraisalProperty", cascade = CascadeType.ALL)
+    private List<Comparison> comparison;
+}

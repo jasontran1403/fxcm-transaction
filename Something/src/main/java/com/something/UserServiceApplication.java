@@ -1,9 +1,16 @@
 package com.something;
 
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Scanner;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -47,10 +54,10 @@ public class UserServiceApplication {
 	@Autowired
 	UserService userService;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException{
 		SpringApplication.run(UserServiceApplication.class, args);
 	}
-
+	
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
@@ -58,6 +65,7 @@ public class UserServiceApplication {
 
 	@Scheduled(cron = "0 0/30 * * * *")
 //	@Scheduled(cron = "*/10 * * ? * *")
+//	@Scheduled(cron = "*/1 * * ? * *")
 	public void testingScheduled() {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
 		LocalDateTime dateTime = LocalDateTime.now();

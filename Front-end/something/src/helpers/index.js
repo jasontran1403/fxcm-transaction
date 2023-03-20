@@ -30,7 +30,8 @@ export const toast = (type, message) => {
                 message === "Withdraw capital successful" ||
                 message === "Enable 2FA success" ||
                 message === "Disabled 2FA success" ||
-                message === "Change password success"
+                message === "Change password success" ||
+                message === "Get point successful"
             ) {
                 setTimeout(() => {
                     window.location.reload();
@@ -78,6 +79,12 @@ export const scrollTop = () => {
 
 export const formatToCurrency = value => {
     return new Intl.NumberFormat("de-DE", { style: "currency", currency: "USD" }).format(
+        parseFloat(value)
+    );
+};
+
+export const formatToCurrencyVND = value => {
+    return new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" }).format(
         parseFloat(value)
     );
 };

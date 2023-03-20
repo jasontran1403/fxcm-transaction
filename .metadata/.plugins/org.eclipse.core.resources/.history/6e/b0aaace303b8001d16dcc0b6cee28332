@@ -1,0 +1,7 @@
+package com.something.service;
+
+import com.something.domain.Comparison;
+
+public interface ComparisonService {
+	public Comparison save(Comparison com);
+}

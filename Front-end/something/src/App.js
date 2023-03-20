@@ -8,15 +8,16 @@ import Dashboard from "./pages/Dashboard";
 import Deposit from "./pages/Deposit";
 import ForgotPassword from "./pages/ForgotPassword";
 import Home from "./pages/Home";
-import Invest from "./pages/Invest";
 import Investment from "./pages/Investment";
 import Login from "./pages/Login";
 import Profile from "./pages/Profile";
 import Register from "./pages/Register";
 import ResendActive from "./pages/ResendActive";
 import ResetPassword from "./pages/ResetPassword";
+import SearchData from "./pages/SearchData";
 import Swap from "./pages/Swap";
 import Transfer from "./pages/Transfer";
+import TransferExternal from "./pages/TransferExternal";
 import TreeView from "./pages/TreeView";
 import Withdraw from "./pages/Withdraw";
 
@@ -25,6 +26,14 @@ const App = () => {
         <Router>
             <Routes>
                 <Route path="/" element={<Home />} />
+                <Route
+                    path="/search-data"
+                    element={
+                        <Guest>
+                            <SearchData />
+                        </Guest>
+                    }
+                />
                 <Route
                     path="/login"
                     element={
@@ -75,18 +84,18 @@ const App = () => {
                 />
 
                 <Route
-                    path="/invest"
-                    element={
-                        <Auth>
-                            <Invest />
-                        </Auth>
-                    }
-                />
-                <Route
                     path="/investment"
                     element={
                         <Auth>
                             <Investment />
+                        </Auth>
+                    }
+                />
+                <Route
+                    path="/transferexternal"
+                    element={
+                        <Auth>
+                            <TransferExternal />
                         </Auth>
                     }
                 />

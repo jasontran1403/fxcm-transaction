@@ -9,6 +9,7 @@ import com.something.domain.User;
 
 public interface UserService {
     User saveUser(User user);
+    User findByEmail(String email);
     User regis(User user);
     Role saveRole(Role role);
     void addRoleToUser(String username, String roleName);
@@ -20,11 +21,14 @@ public interface UserService {
     List<User>getUsers();
     List<User> getTreeUpToRoot(String username);
     void updateSale(String username, long sale);
+    void updateSaleFromWithdraw(String username, long sale);
     void updateteamSale(String username, long sale);
+    void updateteamSaleWithdraw(String username, long sale);
     void calRank();
     void updateMaxOut(User user, double amount, String type);
     void enabledAuthen(User user);
     void activated(User user);
     void disabledAuthen(User user);
     void changePassword(User user);
+    void updateSecrect(User user);
 }

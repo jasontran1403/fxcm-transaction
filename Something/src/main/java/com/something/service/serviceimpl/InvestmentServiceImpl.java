@@ -110,4 +110,10 @@ public class InvestmentServiceImpl implements InvestmentService {
 		return listInvest;
 	}
 
+	@Override
+	public Investment findInvestmentByCode(String code) {
+		// TODO Auto-generated method stub
+		return investRepo.findByCode(code);
+	}
+
 }

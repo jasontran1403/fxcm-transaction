@@ -1,0 +1,11 @@
+package com.something.service;
+
+import java.util.List;
+
+import com.something.domain.Appraisal;
+import com.something.domain.Comparison;
+
+public interface ComparisonService {
+	public Comparison save(Comparison com);
+	public List<Comparison> findByAppraisal(Appraisal app);
+}

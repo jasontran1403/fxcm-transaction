@@ -1,0 +1,38 @@
+package com.something.utils;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+public class TransactionStatus {
+	public static void checkTransactionStatus(String txHash) throws IOException {
+        String url = "https://api.bscscan.com/api?module=transaction&action=gettxreceiptstatus&txhash=" + txHash;
+        URL obj = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) obj.openConnection();
+        
+        // Setting HTTP request header
+        con.setRequestMethod("GET");
+        con.setRequestProperty("User-Agent", "Mozilla/5.0");
+        
+        // Reading HTTP response
+        BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream()));
+        String inputLine;
+        StringBuffer response = new StringBuffer();
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+        in.close();
+        
+        // Parsing JSON response to check transaction status
+        String status = response.toString().split(":")[1].replaceAll("[\"}]","").trim();
+        System.out.println(response);
+//        if (status.equals("1")) {
+//            System.out.println("Transaction " + txHash + " succeeded.");
+//        } else {
+//            System.out.println("Transaction " + txHash + " failed.");
+//        }
+    }
+
+}

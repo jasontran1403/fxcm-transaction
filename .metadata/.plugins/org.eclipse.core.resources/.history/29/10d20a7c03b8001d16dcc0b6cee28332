@@ -1,0 +1,44 @@
+package com.something.service.serviceimpl;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.something.domain.Appraisal;
+import com.something.domain.Comparison;
+import com.something.repo.AppraisalRepo;
+import com.something.repo.ComparisonRepo;
+import com.something.service.AppraisalService;
+
+@Service
+public class AppraisalServiceImpl implements AppraisalService{
+	@Autowired
+	AppraisalRepo appRepo;
+
+	@Autowired
+	ComparisonRepo comRepo;
+	
+	@Override
+	public Appraisal save(Appraisal app) {
+		// TODO Auto-generated method stub
+		return appRepo.save(app);
+	}
+
+	@Override
+	public List<Appraisal> findByKeyword(String keyword) {
+		// TODO Auto-generated method stub
+		return appRepo.findByKeyword(keyword);
+	}
+
+	@Override
+	public Appraisal getById(long id) {
+		// TODO Auto-generated method stub
+		Appraisal app = appRepo.findById(id);
+		System.out.println(app);
+		//listComparison = comRepo.findByAppraisal(app);
+		return app;
+	}
+
+}

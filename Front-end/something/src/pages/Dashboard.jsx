@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 
 import Analytics from "../components/Analytics";
 import Datatable from "../components/datatables/Datatable";
-import { PageTitle } from "../components/utils";
 import config from "../config";
 import { formatToCurrency } from "../helpers";
 import env from "../helpers/env";
@@ -140,22 +139,22 @@ const ReloadAccount = () => {
                 />
             </div>
 
-            <PageTitle>History</PageTitle>
-
-            <Datatable
-                head={["Code", "Time", "Investment Code", "From", "Amount", "Type", "Status"]}
-                dataProperty={[
-                    "code",
-                    "date",
-                    "investmentcode",
-                    "from",
-                    "amount",
-                    "type",
-                    "status"
-                ]}
-                list={data}
-                loading={loading}
-            />
+            <div className="grid grid-cols-1 mt-7">
+                <Datatable
+                    head={["Code", "Time", "Investment Code", "From", "Amount", "Type", "Status"]}
+                    dataProperty={[
+                        "code",
+                        "date",
+                        "investmentcode",
+                        "from",
+                        "amount",
+                        "type",
+                        "status"
+                    ]}
+                    list={data}
+                    loading={loading}
+                />
+            </div>
         </AdminLayout>
     );
 };

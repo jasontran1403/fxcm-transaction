@@ -1,0 +1,5 @@
+package com.something.domain;
+
+public class Comparison {
+
+}

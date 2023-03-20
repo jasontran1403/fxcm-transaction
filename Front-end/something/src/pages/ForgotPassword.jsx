@@ -1,16 +1,20 @@
+import Axios from "axios";
+import qs from "qs";
 import React, { useState } from "react";
 
 import { PrimaryButton } from "../components/buttons";
 import { Input } from "../components/field";
 import { Link, Loader } from "../components/utils";
 import { toast } from "../helpers";
-//import env from "../helpers/env";
+import env from "../helpers/env";
 import AuthLayout from "../layouts/AuthLayout";
 
 const ForgotPassword = () => {
     const [validationMessage, setValidationMessage] = useState([]);
     const [email, setEmail] = useState("");
     const [loading, setLoading] = useState(false);
+    let regex =
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 
     const onSubmit = () => {
         setLoading(true);
@@ -18,19 +22,39 @@ const ForgotPassword = () => {
         setTimeout(() => {
             setLoading(false);
             if (email) {
-                if (email !== (process.env.REACT_APP_LOGIN || "paydunya@gmail.com")) {
-                    toast("error", "Failed to reload account");
-                    setValidationMessage(["The email does not match a user"]);
+                if (regex.test(email)) {
+                    let data = qs.stringify({
+                        email: email
+                    });
+                    let config = {
+                        method: "post",
+                        url: `${env}/api/user/forgotpassword`,
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded"
+                        },
+                        data: data
+                    };
+
+                    Axios(config).then(response => {
+                        if (response.data === "Email is not existed") {
+                            toast("error", "This email address is not existed, please try again.");
+                        } else {
+                            toast(
+                                "success",
+                                "An email has been sent to you to reset your password."
+                            );
+                            setEmail("");
+                            setValidationMessage([]);
+                        }
+                    });
                 } else {
-                    toast("success", "An email has been sent to you to reset your password.");
-                    setEmail("");
-                    setValidationMessage([]);
+                    toast("error", "Email address is invalid, please try again.");
+                    setValidationMessage(["Email address is invalid"]);
                 }
             } else {
-                toast("error", "Failed to reload account");
-                setValidationMessage(["This field is required"]);
+                setValidationMessage(["Email is required"]);
             }
-        }, 3000);
+        }, 300);
     };
 
     return (

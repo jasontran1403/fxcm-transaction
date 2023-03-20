@@ -1,0 +1,21 @@
+package com.something.service.serviceimpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.something.domain.Comparison;
+import com.something.repo.ComparisonRepo;
+import com.something.service.ComparisonService;
+
+@Service
+public class ComparisonServiceImpl implements ComparisonService{
+	@Autowired
+	ComparisonRepo comRepo;
+
+	@Override
+	public Comparison save(Comparison com) {
+		// TODO Auto-generated method stub
+		return comRepo.save(com);
+	}
+
+}

@@ -19,13 +19,14 @@ const DatatableHead = ({
                     <option value={10}>10</option>
                     <option value={20}>20</option>
                     <option value={50}>50</option>
-                    <option value={50}>100</option>
+                    <option value={100}>100</option>
                 </Select>
             </LeftContainer>
 
             <RightContainer>
                 <div className="relative">
                     <Input
+                        className="max-sm:w-20"
                         type="text"
                         placeholder="Search..."
                         value={searchValue}
@@ -61,15 +62,15 @@ const DatatableHead = ({
 export default DatatableHead;
 
 const Container = styled.div.attrs(() => ({
-    className: "flex items-center justify-between p-5"
+    className: "flex items-center justify-between"
 }))``;
 
 const LeftContainer = styled.div.attrs(() => ({
-    className: "flex items-center space-x-3"
+    className: "flex items-center"
 }))``;
 
 const RightContainer = styled.div.attrs(() => ({
-    className: "flex items-center space-x-3"
+    className: "flex items-center lg:"
 }))``;
 
 const Select = styled.select.attrs(() => ({

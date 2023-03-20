@@ -212,55 +212,61 @@ const Transfer = () => {
     return (
         <AdminLayout>
             <div className="px-4 py-3 bg-white border rounded-md shadow-xs col-span-full">
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <p className="flex w-3/4 text-2xl font-light text-orange-500 transition-all duration-300">
                         Receiver's username
-                        <input
-                            type="text"
-                            value={receiver}
-                            placeholder="Receiver username"
-                            onChange={e => {
-                                setReceiver(e.target.value);
-                            }}
-                        />
                     </p>
+                    <input
+                        type="text"
+                        className="select w-3/4"
+                        value={receiver}
+                        placeholder="Receiver username"
+                        onChange={e => {
+                            setReceiver(e.target.value);
+                        }}
+                    />
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <p className="flex w-3/4 text-2xl font-light text-orange-500 transition-all duration-300">
                         Receiver's fullname
-                        <input
-                            disabled
-                            type="text"
-                            value={fullname}
-                            placeholder="Receiver fullname"
-                        />
                     </p>
+                    <input
+                        disabled
+                        className="select w-3/4"
+                        type="text"
+                        value={fullname}
+                        placeholder="Receiver fullname"
+                    />
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <p className="flex w-3/4 text-2xl font-light text-orange-500 transition-all duration-300">
                         Amount
-                        <input
-                            type="number"
-                            value={amount}
-                            min="0"
-                            placeholder="Amount"
-                            onChange={e => {
-                                setAmount(e.target.value);
-                            }}
-                        />
                     </p>
+                    <input
+                        type="number"
+                        className="select w-3/4"
+                        value={amount}
+                        min="0"
+                        placeholder="Amount"
+                        onChange={e => {
+                            setAmount(e.target.value);
+                        }}
+                    />
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
                     <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
-                        Commission {formatToCurrency(commissionBalance)}
+                        Commission
+                    </p>
+                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                        {formatToCurrency(commissionBalance)}
                     </p>
                 </div>
 
                 <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <div className="loading-bar bg-white border rounded-md w-1/4">
+                    <div className="loading-bar bg-white border rounded-md w-full">
                         <div
                             className="progress-bar"
                             style={{

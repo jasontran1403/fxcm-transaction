@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
-		<item key="selection" value="/users"/>
+		<item key="selection" value="excel"/>
 		<item key="wrap" value="true"/>
 		<item key="casesensitive" value="false"/>
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
 		<list key="findhistory">
-			<item value="/users"/>
-			<item value="users"/>
-			<item value="System.out"/>
-			<item value="System"/>
-			<item value="updateRegistered"/>
-			<item value="Put"/>
-			<item value="/regis"/>
-			<item value="uuid"/>
+			<item value="appraisal"/>
+			<item value="excel"/>
+			<item value="Excel"/>
+			<item value="ResponseEntity&lt;String&gt;"/>
+			<item value="user.setSecret(secret);"/>
+			<item value="//"/>
+			<item value=".setSec"/>
 			<item value="regis"/>
-			<item value="/valid"/>
-			<item value="valid"/>
-			<item value="/login"/>
-			<item value="api/login"/>
-			<item value="validation"/>
-			<item value="IASHMVWZMZ2GY363252ADW2MI4FOK3N4"/>
+			<item value="disabled"/>
+			<item value="https://"/>
+			<item value="http://"/>
+			<item value="http"/>
+			<item value="resend"/>
+			<item value="active"/>
+			<item value="forgot"/>
 		</list>
 		<list key="replacehistory">
 		</list>

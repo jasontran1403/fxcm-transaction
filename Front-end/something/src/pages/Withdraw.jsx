@@ -165,61 +165,66 @@ const Withdraw = () => {
     return (
         <AdminLayout>
             <div className="px-4 py-3 bg-white border rounded-md shadow-xs col-span-full">
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300 w-3/4">
                         Network
-                        <select
-                            className="select w-auto"
-                            name="network"
-                            onChange={e => {
-                                setNetworkChoose(e.target.value);
-                            }}
-                        >
-                            <option value="default">Vui lòng chọn mạng</option>
-                            <option value={network[0].name}>{network[0].name}</option>
-                            <option value={network[1].name}>{network[1].name}</option>
-                            <option value={network[2].name}>{network[2].name}</option>
-                        </select>
                     </p>
+                    <select
+                        className="select w-3/4"
+                        name="network"
+                        onChange={e => {
+                            setNetworkChoose(e.target.value);
+                        }}
+                    >
+                        <option value="default">Vui lòng chọn mạng</option>
+                        <option value={network[0].name}>{network[0].name}</option>
+                        <option value={network[1].name}>{network[1].name}</option>
+                        <option value={network[2].name}>{network[2].name}</option>
+                    </select>
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <p className="flex w-3/4 text-2xl font-light text-orange-500 transition-all duration-300">
                         Wallet Address
-                        <input
-                            type="text"
-                            value={crypto}
-                            placeholder="Cryptocurrency"
-                            onChange={e => {
-                                setCrypto(e.target.value);
-                            }}
-                        />
                     </p>
+                    <input
+                        className="select w-3/4"
+                        type="text"
+                        value={crypto}
+                        placeholder="Cryptocurrency"
+                        onChange={e => {
+                            setCrypto(e.target.value);
+                        }}
+                    />
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <p className="flex w-3/4 text-2xl font-light text-orange-500 transition-all duration-300">
                         Amount
-                        <input
-                            type="number"
-                            value={amount}
-                            min="0"
-                            placeholder="Amount"
-                            onChange={e => {
-                                setAmount(e.target.value);
-                            }}
-                        />
                     </p>
+                    <input
+                        type="number"
+                        className="select w-3/4"
+                        value={amount}
+                        min="0"
+                        placeholder="Amount"
+                        onChange={e => {
+                            setAmount(e.target.value);
+                        }}
+                    />
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
                     <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
-                        Balance {formatToCurrency(cashBalance)}
+                        Balance
+                    </p>
+                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                        {formatToCurrency(cashBalance)}
                     </p>
                 </div>
 
                 <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <div className="loading-bar bg-white border rounded-md w-1/4">
+                    <div className="loading-bar bg-white border rounded-md w-full">
                         <div
                             className="progress-bar"
                             style={{

@@ -1,9 +1,0 @@
-package com.something.service;
-
-import com.something.domain.Activation;
-
-public interface ActivationService {
-	public Activation getActivation(Activation acti);
-	public Activation reGenerateActi(Activation acti);
-	public Activation activate(Activation acti);
-}

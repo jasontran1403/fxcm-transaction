@@ -52,7 +52,6 @@ const TreeView = () => {
     };
 
     const handleGenerateRef = (placement, side) => {
-        console.log(placement);
         let configGetIfExisted = {
             method: "get",
             url: `${env}/api/affiliate/getByPlacement/${placement}/${side}`
@@ -60,7 +59,7 @@ const TreeView = () => {
 
         Axios(configGetIfExisted).then(response => {
             if (response.data) {
-                setUrl(`${env}:3000/register/${response.data.uuid}`);
+                setUrl(`http://183.80.19.88:3000/register/${response.data.uuid}`);
             } else {
                 let data = qs.stringify({
                     root: currentUsername,
@@ -78,7 +77,7 @@ const TreeView = () => {
                 };
 
                 Axios(config).then(response => {
-                    setUrl(`${env}:3000/register/${response.data.uuid}`);
+                    setUrl(`http://183.80.19.88:3000/register/${response.data.uuid}`);
                 });
             }
         });
@@ -89,7 +88,6 @@ const TreeView = () => {
         if (username === null) {
             return;
         } else {
-            console.log(username);
             let config = {
                 method: "get",
                 url: `${env}/api/userMapDown5Level/${username}`
@@ -103,12 +101,6 @@ const TreeView = () => {
                 setRefF4(response.data.L4);
             });
         }
-    };
-
-    const handleCopyRefLink = () => {
-        navigator.clipboard.writeText(url).then(function () {
-            alert("Copied to clipboard!");
-        });
     };
 
     return (
@@ -1765,11 +1757,9 @@ const TreeView = () => {
                 </ul>
             </div>
             <Modal isOpen={modalIsOpen} onRequestClose={closeModal} style={customStyles}>
-                <form className="flex flex-col">
-                    <input className="flex mb-10" value={url} readOnly />
-                    <button className="non-existed" onClick={() => handleCopyRefLink()}>
-                        Copy Ref Link
-                    </button>
+                <form className="flex flex-col justify-center items-center">
+                    Reflink:
+                    <input className="flex text-center mb-10 w-96" value={url} readOnly />
                 </form>
             </Modal>
         </AdminLayout>

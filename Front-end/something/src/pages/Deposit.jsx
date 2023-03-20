@@ -152,41 +152,41 @@ const Deposit = () => {
 
     return (
         <AdminLayout>
-            <div className="px-4 py-3 bg-white border rounded-md shadow-xs col-span-full">
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+            <div className="px-4 py-3 bg-white border rounded-md shadow-xs">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <p className="flex w-3/4 text-2xl font-light text-orange-500 transition-all duration-300">
                         Network
-                        <select className="select w-auto">
-                            <option>Vui lòng chọn mạng</option>
-                        </select>
                     </p>
+                    <select className="select w-3/4">
+                        <option>Vui lòng chọn mạng</option>
+                    </select>
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <p className="flex w-3/4 text-2xl font-light text-orange-500 transition-all duration-300">
                         Currency
-                        <select className="select w-auto">
-                            <option>Vui lòng chọn loại tiền</option>
-                        </select>
                     </p>
+                    <select className="select w-3/4">
+                        <option>Vui lòng chọn loại tiền</option>
+                    </select>
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <p className="flex w-3/4 text-2xl font-light text-orange-500 transition-all duration-300">
                         Số lượng
-                        <input
-                            className="select w-auto"
-                            type="number"
-                            min="0"
-                            onChange={e => {
-                                setAmount(e.target.value);
-                            }}
-                        />
                     </p>
+                    <input
+                        className="select w-3/4"
+                        type="number"
+                        min="0"
+                        onChange={e => {
+                            setAmount(e.target.value);
+                        }}
+                    />
                 </div>
 
                 <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <div className="loading-bar bg-white border rounded-md w-1/4">
+                    <div className="loading-bar bg-white border rounded-md w-full">
                         <div
                             className="progress-bar"
                             style={{

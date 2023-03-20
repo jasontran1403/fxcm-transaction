@@ -1,0 +1,5 @@
+package com.something.utils;
+
+public class TransactionStatus {
+
+}

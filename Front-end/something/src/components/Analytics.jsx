@@ -73,6 +73,7 @@ const Analytics = ({
             if (response.data.length > 0) {
                 setExpenses({
                     investmentName: response.data[0].packageId,
+                    investmentCode: response.data[0].code,
                     startAt: response.data[0].time.substring(9, response.data[0].time.length),
                     endAt: countDateEnd(response.data[0].time),
                     percentage: Math.floor((response.data[0].count / 300) * 100),
@@ -106,7 +107,7 @@ const Analytics = ({
     const handleSubmit = () => {
         let config = {
             method: "get",
-            url: `${env}/api/investment/withdrawCapital/cac7ac4b0472`
+            url: `${env}/api/investment/withdrawCapital/${expenses.investmentCode}`
         };
 
         Axios(config)
@@ -157,6 +158,7 @@ const Analytics = ({
                                                     onClick={() => {
                                                         setExpenses({
                                                             investmentName: investment.packageId,
+                                                            investmentCode: investment.code,
                                                             startAt: investment.time.substring(
                                                                 9,
                                                                 investment.time.length
@@ -274,30 +276,32 @@ const Analytics = ({
                     </div>
                 </div>
             </div>
-            <div className="relative col-span-6 px-4 py-3 overflow-hidden text-white bg-white bg-blue-500 border rounded-md shadow-xs md:col-span-3 lg:col-span-2">
-                <div
-                    className="absolute z-0 bg-blue-800 rounded-full bg-opacity-70 ml-36"
-                    style={{ height: "310px", width: "382px", left: "8%", top: "-45px" }}
-                />
-                <div className="relative flex justify-between">
-                    <h3 className="font-light text-white text-opacity-100">USDT Wallet</h3>
-                    <div className="text-right">
-                        <p className="text-xl font-light text-white text-opacity-90">
-                            {formatToCurrency(cashBalance)}
-                        </p>
-                    </div>
+            <div className="col-span-6 px-4 py-3 bg-white border rounded-md shadow-xs md:col-span-3 lg:col-span-2">
+                <div className="flex flex-row items-center justify-between">
+                    <p className="text-xl font-light text-black text-opacity-90">USDT Balance</p>
+                    <p className="text-xl font-light text-black text-opacity-90">
+                        {formatToCurrency(cashBalance)}
+                    </p>
                 </div>
-                <div className="relative flex justify-between">
-                    <h3 className="font-light text-white text-opacity-100">Commission Wallet</h3>
-                    <div className="text-right">
-                        <p className="text-xl font-light text-white text-opacity-90">
-                            {formatToCurrency(commissionBalance)}
-                        </p>
-                    </div>
+                <div className="flex flex-row items-center justify-between">
+                    <p className="text-xl font-light text-black text-opacity-90">
+                        Commission Balance
+                    </p>
+                    <p className="text-xl font-light text-black text-opacity-90">
+                        {formatToCurrency(commissionBalance)}
+                    </p>
                 </div>
-
-                <div className="relative flex justify-center" style={{ height: "313px" }}>
-                    <div className="text-right">{rank > 0 && <Image src={rank} />}</div>
+                <div className="flex justify-center col-span-1 mt-3">
+                    <div className="flex flex-col justify-start col-span-1 mt-8">
+                        {rank > 0 && (
+                            <>
+                                <span className="text-xl font-light text-black text-opacity-90 text-center">
+                                    {packageName[rank].name}
+                                </span>
+                                <Image src={rank} />
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

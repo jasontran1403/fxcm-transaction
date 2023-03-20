@@ -248,7 +248,7 @@ const Datatable = ({
                 loading={loading}
             />
 
-            <div className="overflow-y-visible">
+            <div className="overflow-y-visible overflow-x-auto">
                 <table className="w-full table-auto text-sm">
                     <TableHead
                         head={head}
@@ -290,7 +290,7 @@ const Datatable = ({
 export default Datatable;
 
 const Container = styled.div.attrs(() => ({
-    className: "bg-white w-full border rounded-md"
+    className: "bg-white w-full border rounded-md text-red-500 p-4 md:p-8"
 }))``;
 
 const TableItem = styled.td.attrs(props => ({

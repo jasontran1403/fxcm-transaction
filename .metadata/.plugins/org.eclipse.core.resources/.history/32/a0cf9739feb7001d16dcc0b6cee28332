@@ -1,0 +1,21 @@
+package com.something.service.serviceimpl;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.something.domain.Appraisal;
+import com.something.repo.AppraisalRepo;
+import com.something.service.AppraisalService;
+
+@Service
+public class AppraisalServiceImpl implements AppraisalService{
+	@Autowired
+	AppraisalRepo appRepo;
+
+	@Override
+	public Appraisal save(Appraisal app) {
+		// TODO Auto-generated method stub
+		return appRepo.save(app);
+	}
+
+}

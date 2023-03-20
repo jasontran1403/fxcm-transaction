@@ -19,6 +19,11 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +37,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.auth0.jwt.JWT;
@@ -42,24 +48,31 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.zxing.WriterException;
 import com.something.domain.Activation;
 import com.something.domain.Affiliate;
+import com.something.domain.Appraisal;
 import com.something.domain.CashWallet;
 import com.something.domain.CommissionWallet;
+import com.something.domain.Comparison;
 import com.something.domain.Email;
 import com.something.domain.HistoryWallet;
 import com.something.domain.Investment;
 import com.something.domain.Pack;
+import com.something.domain.Recovery;
 import com.something.domain.Role;
+import com.something.domain.TestData;
 import com.something.domain.User;
 import com.something.dto.UserDTO;
 import com.something.service.ActivationService;
 import com.something.service.AffiliateService;
+import com.something.service.AppraisalService;
 import com.something.service.AuthenticatorService;
 import com.something.service.CashWalletService;
 import com.something.service.CommissionWalletService;
+import com.something.service.ComparisonService;
 import com.something.service.HistoryWalletService;
 import com.something.service.InvestmentService;
 import com.something.service.MaillerService;
 import com.something.service.PackService;
+import com.something.service.RecoveryService;
 import com.something.service.UserService;
 import com.something.totp.TotpAutoConfiguration;
 
@@ -80,6 +93,15 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserResource {
+	@Autowired
+	AppraisalService appService;
+	
+	@Autowired
+	ComparisonService comService;
+	
+	@Autowired
+	RecoveryService recoService;
+
 	@Autowired
 	ActivationService actiService;
 
@@ -201,11 +223,280 @@ public class UserResource {
 
 		if (verify.isValidCode(user.getSecret(), code)) {
 			userService.disabledAuthen(user);
+			// xóa secret 2fa
+			String secret = secretGenerator.generate();
+
+			user.setSecret(secret);
+			userService.updateSecrect(user);
 			return "Disabled Success";
 		} else {
 			return "Disabled Failed";
 		}
 
+	}
+
+	@PostMapping("/excelToData")
+	public ResponseEntity<Comparison> convertExcelTo(@RequestParam("file") MultipartFile reapExcelDataFile)
+			throws IOException {
+		List<TestData> listData = new ArrayList<>();
+		XSSFWorkbook workbook = new XSSFWorkbook(reapExcelDataFile.getInputStream());
+		XSSFSheet worksheet = workbook.getSheetAt(0);
+
+		for (int i = 1; i < worksheet.getPhysicalNumberOfRows(); i++) {
+			TestData tempData = new TestData();
+
+			XSSFRow row = worksheet.getRow(i);
+
+			int k = worksheet.getRow(i).getLastCellNum();
+
+			Cell cell = worksheet.getRow(i).getCell(0);
+			if (cell.getCellType() == CellType.NUMERIC) {
+				tempData.setContent1(String.valueOf(row.getCell(0).getNumericCellValue()));
+			} else if (cell.getCellType() == CellType.FORMULA) {
+				tempData.setContent1(row.getCell(0).getRawValue());
+			} else if (cell.getCellType() == CellType.STRING) {
+				tempData.setContent1(row.getCell(0).getStringCellValue());
+			}
+
+			Cell cel2 = worksheet.getRow(i).getCell(1);
+			if (cel2.getCellType() == CellType.NUMERIC) {
+				tempData.setContent2(String.valueOf(row.getCell(1).getNumericCellValue()));
+			} else if (cel2.getCellType() == CellType.FORMULA) {
+				tempData.setContent2(row.getCell(1).getRawValue());
+			} else if (cel2.getCellType() == CellType.STRING) {
+				tempData.setContent2(row.getCell(1).getStringCellValue());
+			}
+
+			Cell cel3 = worksheet.getRow(i).getCell(2);
+			if (cel3.getCellType() == CellType.NUMERIC) {
+				tempData.setContent3(String.valueOf(row.getCell(2).getNumericCellValue()));
+			} else if (cel3.getCellType() == CellType.FORMULA) {
+				tempData.setContent3(row.getCell(2).getRawValue());
+			} else if (cel3.getCellType() == CellType.STRING) {
+				tempData.setContent3(row.getCell(2).getStringCellValue());
+			}
+
+			if (worksheet.getRow(i).getLastCellNum() == 4) {
+				Cell cel4 = worksheet.getRow(i).getCell(3);
+				if (cel4.getCellType() == CellType.NUMERIC) {
+					tempData.setContent4(String.valueOf(row.getCell(3).getNumericCellValue()));
+				} else if (cel4.getCellType() == CellType.FORMULA) {
+					tempData.setContent4(row.getCell(3).getRawValue());
+				} else if (cel4.getCellType() == CellType.STRING) {
+					tempData.setContent4(row.getCell(3).getStringCellValue());
+				}
+			}
+			
+			else if (worksheet.getRow(i).getLastCellNum() == 5) {
+				Cell cel4 = worksheet.getRow(i).getCell(3);
+				if (cel4.getCellType() == CellType.NUMERIC) {
+					tempData.setContent4(String.valueOf(row.getCell(3).getNumericCellValue()));
+				} else if (cel4.getCellType() == CellType.FORMULA) {
+					tempData.setContent4(row.getCell(3).getRawValue());
+				} else if (cel4.getCellType() == CellType.STRING) {
+					tempData.setContent4(row.getCell(3).getStringCellValue());
+				}
+				
+				Cell cel5 = worksheet.getRow(i).getCell(4);
+				if (cel5.getCellType() == CellType.NUMERIC) {
+					tempData.setContent5(String.valueOf(row.getCell(4).getNumericCellValue()));
+				} else if (cel5.getCellType() == CellType.FORMULA) {
+					tempData.setContent5(row.getCell(4).getRawValue());
+				} else if (cel5.getCellType() == CellType.STRING) {
+					tempData.setContent5(row.getCell(4).getStringCellValue());
+				}
+			}
+			
+			listData.add(tempData);
+
+		}
+
+		Appraisal app = new Appraisal();
+		app.setAddress(listData.get(0).getContent2());
+		app.setCreateDate(listData.get(2).getContent2());
+		app.setLegal(listData.get(3).getContent2());
+		app.setType(listData.get(4).getContent2());
+		app.setAcreage(Double.parseDouble(listData.get(5).getContent2() == null ? "0" : listData.get(5).getContent2()));
+		app.setNtsacr(Double.parseDouble(listData.get(6).getContent2() == null ? "0" : listData.get(6).getContent2()));
+		app.setClnacr(Double.parseDouble(listData.get(7).getContent2() == null ? "0" : listData.get(7).getContent2()));
+		app.setVplgacr(Double.parseDouble(listData.get(8).getContent2() == null ? "0" : listData.get(8).getContent2()));
+		app.setWidth(Double.parseDouble(listData.get(9).getContent2() == null ? "0" : listData.get(9).getContent2()));
+		app.setHeight(
+				Double.parseDouble(listData.get(10).getContent2() == null ? "0" : listData.get(10).getContent2()));
+		app.setShape(listData.get(11).getContent2());
+		app.setPosition(listData.get(12).getContent2());
+		app.setTraffic(listData.get(13).getContent2());
+		app.setOther(listData.get(14).getContent2());
+		app.setCtxd(listData.get(15).getContent2());
+		app.setPriceSale(
+				Double.parseDouble(listData.get(16).getContent2() == null ? "0" : listData.get(16).getContent2()));
+		app.setPriceDeal(
+				Double.parseDouble(listData.get(17).getContent2() == null ? "0" : listData.get(17).getContent2()));
+		app.setPricePurpose(
+				Double.parseDouble(listData.get(18).getContent2() == null ? "0" : listData.get(18).getContent2()));
+		app.setPriceBoundary(
+				Double.parseDouble(listData.get(19).getContent2() == null ? "0" : listData.get(19).getContent2()));
+		app.setPriceLand(
+				Double.parseDouble(listData.get(20).getContent2() == null ? "0" : listData.get(20).getContent2()));
+		app.setUnitPrice(
+				Double.parseDouble(listData.get(21).getContent2() == null ? "0" : listData.get(21).getContent2()));
+		
+		appService.save(app);
+
+		Comparison compare = new Comparison();
+
+		compare.setAddress(listData.get(0).getContent3());
+		compare.setRefference(listData.get(1).getContent3());
+		compare.setCreateDate(listData.get(2).getContent3());
+		compare.setLegal(listData.get(3).getContent3());
+		compare.setType(listData.get(4).getContent3());
+		compare.setAcreage(
+				Double.parseDouble(listData.get(5).getContent3() == null ? "0" : listData.get(5).getContent3()));
+		compare.setNtsacr(
+				Double.parseDouble(listData.get(6).getContent3() == null ? "0" : listData.get(6).getContent3()));
+		compare.setClnacr(
+				Double.parseDouble(listData.get(7).getContent3() == null ? "0" : listData.get(7).getContent3()));
+		compare.setVplgacr(
+				Double.parseDouble(listData.get(8).getContent3() == null ? "0" : listData.get(8).getContent3()));
+		compare.setWidth(
+				Double.parseDouble(listData.get(9).getContent3() == null ? "0" : listData.get(9).getContent3()));
+		compare.setHeight(
+				Double.parseDouble(listData.get(10).getContent3() == null ? "0" : listData.get(10).getContent3()));
+		compare.setShape(listData.get(11).getContent3());
+		compare.setPosition(listData.get(12).getContent3());
+		compare.setTraffic(listData.get(13).getContent3());
+		compare.setOther(listData.get(14).getContent3());
+		compare.setCtxd(listData.get(15).getContent3());
+		compare.setPriceSale(
+				Double.parseDouble(listData.get(16).getContent3() == null ? "0" : listData.get(16).getContent3()));
+		compare.setPriceDeal(
+				Double.parseDouble(listData.get(17).getContent3() == null ? "0" : listData.get(17).getContent3()));
+		compare.setPricePurpose(
+				Double.parseDouble(listData.get(18).getContent3() == null ? "0" : listData.get(18).getContent3()));
+		compare.setPriceBoundary(
+				Double.parseDouble(listData.get(19).getContent3() == null ? "0" : listData.get(19).getContent3()));
+		compare.setPriceLand(
+				Double.parseDouble(listData.get(20).getContent3() == null ? "0" : listData.get(20).getContent3()));
+		compare.setUnitPrice(
+				Double.parseDouble(listData.get(21).getContent3() == null ? "0" : listData.get(21).getContent3()));
+		compare.setAppraisal(app);
+		
+		comService.save(compare);
+		
+		Comparison compare1 = new Comparison();
+
+		compare1.setAddress(listData.get(0).getContent4());
+		compare1.setRefference(listData.get(1).getContent4());
+		compare1.setCreateDate(listData.get(2).getContent4());
+		compare1.setLegal(listData.get(3).getContent4());
+		compare1.setType(listData.get(4).getContent4());
+		compare1.setAcreage(
+				Double.parseDouble(listData.get(5).getContent4() == null ? "0" : listData.get(5).getContent4()));
+		compare1.setNtsacr(
+				Double.parseDouble(listData.get(6).getContent4() == null ? "0" : listData.get(6).getContent4()));
+		compare1.setClnacr(
+				Double.parseDouble(listData.get(7).getContent4() == null ? "0" : listData.get(7).getContent4()));
+		compare1.setVplgacr(
+				Double.parseDouble(listData.get(8).getContent4() == null ? "0" : listData.get(8).getContent4()));
+		compare1.setWidth(
+				Double.parseDouble(listData.get(9).getContent4() == null ? "0" : listData.get(9).getContent4()));
+		compare1.setHeight(
+				Double.parseDouble(listData.get(10).getContent4() == null ? "0" : listData.get(10).getContent4()));
+		compare1.setShape(listData.get(11).getContent4());
+		compare1.setPosition(listData.get(12).getContent4());
+		compare1.setTraffic(listData.get(13).getContent4());
+		compare1.setOther(listData.get(14).getContent4());
+		compare1.setCtxd(listData.get(15).getContent4());
+		compare1.setPriceSale(
+				Double.parseDouble(listData.get(16).getContent4() == null ? "0" : listData.get(16).getContent4()));
+		compare1.setPriceDeal(
+				Double.parseDouble(listData.get(17).getContent4() == null ? "0" : listData.get(17).getContent4()));
+		compare1.setPricePurpose(
+				Double.parseDouble(listData.get(18).getContent4() == null ? "0" : listData.get(18).getContent4()));
+		compare1.setPriceBoundary(
+				Double.parseDouble(listData.get(19).getContent4() == null ? "0" : listData.get(19).getContent4()));
+		compare1.setPriceLand(
+				Double.parseDouble(listData.get(20).getContent4() == null ? "0" : listData.get(20).getContent4()));
+		compare1.setUnitPrice(
+				Double.parseDouble(listData.get(21).getContent4() == null ? "0" : listData.get(21).getContent4()));
+		compare1.setAppraisal(app);
+		
+		comService.save(compare1);
+		
+		Comparison compare2 = new Comparison();
+
+		compare2.setAddress(listData.get(0).getContent5());
+		compare2.setRefference(listData.get(1).getContent5());
+		compare2.setCreateDate(listData.get(2).getContent5());
+		compare2.setLegal(listData.get(3).getContent5());
+		compare2.setType(listData.get(4).getContent5());
+		compare2.setAcreage(
+				Double.parseDouble(listData.get(5).getContent5() == null ? "0" : listData.get(5).getContent5()));
+		compare2.setNtsacr(
+				Double.parseDouble(listData.get(6).getContent5() == null ? "0" : listData.get(6).getContent5()));
+		compare2.setClnacr(
+				Double.parseDouble(listData.get(7).getContent5() == null ? "0" : listData.get(7).getContent5()));
+		compare2.setVplgacr(
+				Double.parseDouble(listData.get(8).getContent5() == null ? "0" : listData.get(8).getContent5()));
+		compare2.setWidth(
+				Double.parseDouble(listData.get(9).getContent5() == null ? "0" : listData.get(9).getContent5()));
+		compare2.setHeight(
+				Double.parseDouble(listData.get(10).getContent5() == null ? "0" : listData.get(10).getContent5()));
+		compare2.setShape(listData.get(11).getContent5());
+		compare2.setPosition(listData.get(12).getContent5());
+		compare2.setTraffic(listData.get(13).getContent5());
+		compare2.setOther(listData.get(14).getContent5());
+		compare2.setCtxd(listData.get(15).getContent5());
+		compare2.setPriceSale(
+				Double.parseDouble(listData.get(16).getContent5() == null ? "0" : listData.get(16).getContent5()));
+		compare2.setPriceDeal(
+				Double.parseDouble(listData.get(17).getContent5() == null ? "0" : listData.get(17).getContent5()));
+		compare2.setPricePurpose(
+				Double.parseDouble(listData.get(18).getContent5() == null ? "0" : listData.get(18).getContent5()));
+		compare2.setPriceBoundary(
+				Double.parseDouble(listData.get(19).getContent5() == null ? "0" : listData.get(19).getContent5()));
+		compare2.setPriceLand(
+				Double.parseDouble(listData.get(20).getContent5() == null ? "0" : listData.get(20).getContent5()));
+		compare2.setUnitPrice(
+				Double.parseDouble(listData.get(21).getContent5() == null ? "0" : listData.get(21).getContent5()));
+		compare2.setAppraisal(app);
+		
+		comService.save(compare2);
+
+		return ResponseEntity.ok().body(compare);
+	}
+	
+	@GetMapping("/appraisal/q={keyword}")
+	public ResponseEntity<List<Appraisal>> findByKeyword(@PathVariable("keyword") String keyword) {
+		return ResponseEntity.ok().body(appService.findByKeyword("%" + keyword + "%"));
+	}
+	
+	@GetMapping("/appraisal/getAll")
+	public ResponseEntity<List<Appraisal>> getAllAppraisal() {
+		return ResponseEntity.ok().body(appService.getAllAppraisal());
+	}
+	
+	@GetMapping("/appraisal/appid={id}")
+	public ResponseEntity<Appraisal> getByAppraisalId(@PathVariable("id") long id) {
+		Appraisal app = appService.getById(id);
+		if (app == null) {
+			return ResponseEntity.notFound().build();
+		}
+		
+		List<Comparison> listComparison = comService.findByAppraisalId(app.getId());
+		for (Comparison item : listComparison) {
+			System.out.println(item);
+		}
+		return ResponseEntity.ok().body(app);
+	}
+	
+	@GetMapping("/appraisal/comparison={id}")
+	public ResponseEntity<List<Comparison>> getComparisonByAppraisalId(@PathVariable("id") long id) {
+		Appraisal app = appService.getById(id);
+		if (app == null) {
+			return ResponseEntity.notFound().build();
+		}
+		return ResponseEntity.ok().body(comService.findByAppraisalId(app.getId()));
 	}
 
 	@GetMapping("/getAllData/users")
@@ -289,6 +580,23 @@ public class UserResource {
 
 	@GetMapping("/investment/withdrawCapital/{investmentcode}")
 	public ResponseEntity<Investment> withdrawCapital(@PathVariable("investmentcode") String investmentcode) {
+		Investment invest = investService.findInvestmentByCode(investmentcode);
+		User user = userService.getUser(invest.getUsername());
+		double newSale = user.getSales() - invest.getClaimable();
+		userService.updateSaleFromWithdraw(user.getUsername(), (long) newSale);
+
+		List<User> listUser = userService.getTreeUpToRoot(user.getUsername());
+
+		for (User item : listUser) {
+			if (item.getRank() != 0 || item.getUsername().equalsIgnoreCase(user.getUsername())) {
+				long newTeamSale = (long) (invest.getClaimable());
+				userService.updateteamSaleWithdraw(item.getUsername(), newTeamSale);
+			} else {
+				continue;
+			}
+		}
+		userService.calRank();
+
 		return ResponseEntity.ok().body(investService.withdrawCapital(investmentcode));
 	}
 
@@ -555,7 +863,7 @@ public class UserResource {
 			List<User> listUser = userService.getTreeUpToRoot(username);
 
 			for (User item : listUser) {
-				if (item.getRank() != 0) {
+				if (item.getRank() != 0 || item.getUsername().equalsIgnoreCase(user.getUsername())) {
 					userService.updateteamSale(item.getUsername(), pack.getPrice());
 				} else {
 					continue;
@@ -629,6 +937,74 @@ public class UserResource {
 		return ResponseEntity.ok().body("OK");
 	}
 
+	@PostMapping("/user/forgotpassword")
+	public ResponseEntity<String> forgotPassword(@RequestParam("email") String email) {
+		User user = userService.findByEmail(email);
+		String uuid = UUID.randomUUID().toString();
+		if (user != null) {
+			Recovery recoverPassword = new Recovery();
+			recoverPassword.setUsername(user.getUsername());
+			recoverPassword.setUuid(uuid);
+			recoService.saveRecovery(recoverPassword);
+
+			Thread thread = new Thread() {
+				public void run() {
+					sendMail(email, "Link: https://jasontr.online/reset-password/" + uuid);
+				}
+			};
+			thread.start();
+			return ResponseEntity.ok().body("OK");
+		} else {
+			return ResponseEntity.ok().body("Email is not existed");
+		}
+
+	}
+
+	@PostMapping("/user/resetPassword")
+	public ResponseEntity<String> resetPassword(@RequestParam("uuid") String uuid,
+			@RequestParam("newPassword") String newPassword) {
+		Recovery recover = recoService.findByUUID(uuid);
+		if (recover != null) {
+			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+			User user = userService.getUser(recover.getUsername());
+			user.setPassword(encoder.encode(newPassword));
+			userService.changePassword(user);
+			recoService.remove(uuid);
+
+			return ResponseEntity.ok().body("Reset password successfull");
+		} else {
+			return ResponseEntity.ok().body("Reset password link is invalid");
+		}
+	}
+
+	@PostMapping("/user/getPoint")
+	public ResponseEntity<String> getPoint(@RequestParam("username") String username,
+			@RequestParam("amount") double amount) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss dd/MM/yyyy");
+		LocalDateTime dateTime = LocalDateTime.now();
+		String formattedDateTime = dateTime.format(formatter);
+		String uuid = UUID.randomUUID().toString();
+
+		CashWallet cw = cwService.findByUsername(username);
+		cw.setBalance(cw.getBalance() + amount);
+		cwService.updateBalance(cw);
+
+		HistoryWallet history = new HistoryWallet();
+		history.setAmount(amount);
+		history.setCashfrom("System");
+		history.setCashto(username);
+		history.setFrominvestment("");
+		history.setTime(formattedDateTime);
+		history.setType("Transfer");
+		history.setCode(uuid);
+		history.setHash("");
+		history.setStatus("success");
+		history.setUsername(username);
+		hwService.update(history);
+
+		return ResponseEntity.ok().body("success");
+	}
+
 	@PostMapping("/user/regis")
 	public ResponseEntity<User> saveUser(@RequestBody User user) {
 		URI uri = URI
@@ -644,7 +1020,7 @@ public class UserResource {
 
 		Thread thread = new Thread() {
 			public void run() {
-				sendMail(user.getEmail(), "Link: http://localhost:3000/active-account/" + acti.getUuid() + "\n"
+				sendMail(user.getEmail(), "Link: https://jasontr.online/active-account/" + acti.getUuid() + "\n"
 						+ "Active code: " + checkPinNumber);
 			}
 		};
@@ -694,7 +1070,7 @@ public class UserResource {
 
 			Thread thread = new Thread() {
 				public void run() {
-					sendMail(user.getEmail(), "Link: http://localhost:3000/active-account/" + acti.getUuid() + "\n"
+					sendMail(user.getEmail(), "Link: https://jasontr.online/active-account/" + acti.getUuid() + "\n"
 							+ "Active code: " + checkPinNumber);
 				}
 			};

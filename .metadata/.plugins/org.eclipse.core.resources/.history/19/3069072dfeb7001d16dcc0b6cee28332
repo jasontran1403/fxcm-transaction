@@ -1,0 +1,8 @@
+package com.something.service;
+
+import com.something.domain.Appraisal;
+
+public interface AppraisalService {
+	public Appraisal save(Appraisal app);
+	public Appraisal findByKeyword(String keyword);
+}

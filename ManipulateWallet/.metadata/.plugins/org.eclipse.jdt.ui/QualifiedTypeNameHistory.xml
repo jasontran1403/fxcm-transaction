@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.springframework.http.ResponseEntity"/>
+    <fullyQualifiedTypeName name="com.something.utils.TransactionHistory"/>
+    <fullyQualifiedTypeName name="com.something.utils.BnbTransactionExample"/>
+    <fullyQualifiedTypeName name="org.web3j.tx.gas.DefaultGasProvider"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.methods.response.EthGetTransactionCount"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.DefaultBlockParameterName"/>
+    <fullyQualifiedTypeName name="org.web3j.crypto.RawTransaction"/>
+    <fullyQualifiedTypeName name="org.web3j.crypto.TransactionEncoder"/>
+    <fullyQualifiedTypeName name="org.web3j.utils.Numeric"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.methods.response.EthSendTransaction"/>
+    <fullyQualifiedTypeName name="org.web3j.contracts.eip20.generated.ERC20"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.Web3j"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.methods.response.EthFilter"/>
+    <fullyQualifiedTypeName name="org.web3j.abi.datatypes.Function"/>
+    <fullyQualifiedTypeName name="com.something.utils.Transaction"/>
+    <fullyQualifiedTypeName name="java.math.BigInteger"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.http.HttpService"/>
+    <fullyQualifiedTypeName name="com.fasterxml.jackson.databind.ObjectMapper"/>
+    <fullyQualifiedTypeName name="org.web3j.abi.datatypes.Address"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.DefaultBlockParameter"/>
+    <fullyQualifiedTypeName name="org.web3j.abi.datatypes.Event"/>
+    <fullyQualifiedTypeName name="org.bouncycastle.util.Arrays"/>
+    <fullyQualifiedTypeName name="java.util.Arrays"/>
+    <fullyQualifiedTypeName name="org.web3j.tx.Contract"/>
+    <fullyQualifiedTypeName name="org.web3j.abi.EventEncoder"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.methods.response.EthLog"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.methods.response.TransactionReceipt"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.methods.response.EthBlockNumber"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.methods.response.EthTransaction"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.methods.response.EthBlock.TransactionResult"/>
+    <fullyQualifiedTypeName name="java.util.stream.Collectors"/>
+    <fullyQualifiedTypeName name="org.web3j.abi.TypeReference"/>
+    <fullyQualifiedTypeName name="okhttp3.OkHttpClient"/>
+    <fullyQualifiedTypeName name="org.web3j.protocol.core.Request"/>
+    <fullyQualifiedTypeName name="org.bitcoinj.core.Transaction"/>
+    <fullyQualifiedTypeName name="java.util.ArrayList"/>
+    <fullyQualifiedTypeName name="com.something.entity.Transaction"/>
+    <fullyQualifiedTypeName name="java.util.concurrent.CompletableFuture"/>
+    <fullyQualifiedTypeName name="com.something.utils.TransactionStatus"/>
+</qualifiedTypeNameHistroy>

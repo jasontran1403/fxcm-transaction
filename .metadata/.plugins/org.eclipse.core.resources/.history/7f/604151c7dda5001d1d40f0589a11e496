@@ -1,5 +1,0 @@
-package com.something.totp;
-
-public class TotpProperties {
-
-}

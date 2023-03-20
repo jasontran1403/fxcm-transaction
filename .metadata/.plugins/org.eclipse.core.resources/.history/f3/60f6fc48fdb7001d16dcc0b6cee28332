@@ -1,0 +1,6 @@
+package com.something.service.serviceimpl;
+
+@Service
+public class AppraisalServiceImpl implements AppraisalService{
+
+}

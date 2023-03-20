@@ -5,6 +5,7 @@ import java.util.List;
 import com.something.domain.Investment;
 
 public interface InvestmentService {
+	public Investment findInvestmentByCode(String code);
 	public Investment save(Investment invest);
 	public List<Investment> getAllInvestment();
 	public Investment withdrawCapital(String code);
