@@ -1,5 +1,4 @@
 import Axios from "axios";
-import qs from "qs";
 import React, { useState } from "react";
 
 import config from "../config";
@@ -8,39 +7,40 @@ import env from "../helpers/env";
 import AdminLayout from "../layouts/AdminLayout";
 
 const Profile = () => {
-    const currentUsername = config.AUTH.DRIVER.getItem("username");
-    const [currentPassword, setCurrentPassword] = useState("");
+    const currentEmail = config.AUTH.DRIVER.getItem("email");
+    const currentAccessToken = config.AUTH.DRIVER.getItem("access_token");
     const [newPassword, setNewPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [authen, setAuthen] = useState("");
 
     const handleSubmit = () => {
-        if (currentPassword === "" || newPassword === "" || confirmPassword === "") {
-            alert("All informations are required");
+        if (newPassword === "" || confirmPassword === "" || authen === "") {
+            toast("error", "Tất cả thông tin đều là bắt buộc!");
             return;
         } else if (newPassword !== confirmPassword) {
-            alert("New password and confirm new password is not match");
+            toast("error", "Mật khẩu mới và xác nhận mật khẩu không trùng khớp!");
             return;
         } else {
-            let data = qs.stringify({
-                username: currentUsername,
-                currentPassword: currentPassword,
-                authen: authen,
-                newPassword: newPassword,
-                confirmNewPassword: confirmPassword
+            let data = JSON.stringify({
+                email: currentEmail,
+                password: newPassword,
+                code: authen
             });
+
             let config = {
                 method: "post",
-                url: `${env}/api/user/changePassword`,
+                maxBodyLength: Infinity,
+                url: `${env}/api/v1/demo/change-password`,
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${currentAccessToken}`
                 },
                 data: data
             };
 
             window.Swal.fire({
                 title: "Are you sure?",
-                text: "You wont be able to revert this transaction!",
+                text: "You wont be able to revert this action!",
                 icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#3085d6",
@@ -49,15 +49,13 @@ const Profile = () => {
             }).then(result => {
                 if (result.isConfirmed) {
                     Axios(config).then(response => {
-                        if (response.data === "Change password success") {
-                            toast("success", "Change password success");
-                        } else if (response.data === "2FA code is incorrect") {
-                            toast("error", "2FA Code is incorrect");
-                        } else if (response.data === "Old password is incorrect") {
-                            toast("error", "Old password is incorrect");
+                        if (response.data === "Thay đổi mật khẩu thành công!") {
+                            toast("success", "Thay đổi mật khẩu thành công!");
+                            window.location.reload();
+                        } else if (response.data === "Mã 2FA không chính xác!") {
+                            toast("error", "Mã 2FA không chính xác!");
                         }
                     });
-                    window.Swal.fire("Confirmed!", "Your transaction has been created.", "success");
                 }
             });
         }
@@ -66,65 +64,51 @@ const Profile = () => {
     return (
         <AdminLayout>
             <div className="px-4 py-3 bg-white border rounded-md shadow-xs col-span-full">
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
-                        Current Password
-                        <input
-                            className="select"
-                            type="password"
-                            value={currentPassword}
-                            onChange={e => {
-                                setCurrentPassword(e.target.value);
-                            }}
-                        />
-                    </p>
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <span>New pass</span>
+                    <input
+                        style={{ width: "50%" }}
+                        className="select"
+                        type="password"
+                        value={newPassword}
+                        onChange={e => {
+                            setNewPassword(e.target.value);
+                        }}
+                    />
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
-                        New Password
-                        <input
-                            className="select"
-                            type="password"
-                            value={newPassword}
-                            onChange={e => {
-                                setNewPassword(e.target.value);
-                            }}
-                        />
-                    </p>
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <span>Confirm pass</span>
+                    <input
+                        style={{ width: "50%" }}
+                        className="select"
+                        type="password"
+                        value={confirmPassword}
+                        onChange={e => {
+                            setConfirmPassword(e.target.value);
+                        }}
+                    />
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
-                        Confirm Password
-                        <input
-                            className="select"
-                            type="password"
-                            value={confirmPassword}
-                            onChange={e => {
-                                setConfirmPassword(e.target.value);
-                            }}
-                        />
-                    </p>
+                <div className="flex justify-between col-span-6 mt-3 min-w-min">
+                    <span>2FA</span>
+                    <input
+                        style={{ width: "50%" }}
+                        className="select"
+                        type="text"
+                        value={authen}
+                        onChange={e => {
+                            setAuthen(e.target.value);
+                        }}
+                    />
                 </div>
 
-                <div className="flex justify-center col-span-6 mt-3 min-w-min">
-                    <p className="flex text-2xl font-light text-orange-500 transition-all duration-300">
-                        2FA Authentication
-                        <input
-                            className="select"
-                            type="text"
-                            value={authen}
-                            onChange={e => {
-                                setAuthen(e.target.value);
-                            }}
-                        />
-                    </p>
-                </div>
-
-                <div className="flex justify-center col-span-1 mt-3">
-                    <div className="px-2 py-1 font-semibold text-black-300 bg-emerald-400 rounded">
-                        <button className="place-items-center" onClick={handleSubmit}>
+                <div className="col-span-1 mt-3" style={{ width: "100%" }}>
+                    <div className="px-2 py-1 font-semibold text-black-300 bg-emerald-400 rounded text-center">
+                        <button
+                            className="place-items-center w-100 text-center"
+                            onClick={handleSubmit}
+                        >
                             Submit
                         </button>
                     </div>

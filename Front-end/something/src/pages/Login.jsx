@@ -1,5 +1,4 @@
 import Axios from "axios";
-import qs from "qs";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -14,57 +13,59 @@ import AuthLayout from "../layouts/AuthLayout";
 const Login = () => {
     const navigate = useNavigate();
     const defaultMessage = {
-        username: [],
+        email: [],
         password: []
     };
 
     const [loading, setLoading] = useState(false);
     const [invalid, setInvalid] = useState(false);
     const [errorMessage, setErrorMessage] = useState(defaultMessage);
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [authen, setAuthen] = useState("");
+    const [code, setCode] = useState("");
 
     const login = () => {
         setLoading(true);
         setTimeout(() => {
             const newErrorMessage = defaultMessage;
-            if (!username) {
-                newErrorMessage.username = ["This field is required"];
+            if (!email) {
+                newErrorMessage.email = ["This field is required"];
             }
             if (!password) {
                 newErrorMessage.password = ["This field is required"];
             }
 
-            let dataToken = qs.stringify({
-                username: username,
+            let dataLogin = JSON.stringify({
+                email: email,
                 password: password
             });
+
             let configLogin = {
                 method: "post",
-                url: `${env}/api/login`,
+                url: `${env}/api/v1/auth/authenticate`,
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
+                    "Content-Type": "application/json"
                 },
-                data: dataToken
+                data: dataLogin
             };
 
-            let data = qs.stringify({
-                username: username,
+            let dataValid = JSON.stringify({
+                email: email,
                 password: password,
-                authen: authen
+                code: code
             });
 
-            let configIsActivated = {
+            let configValid = {
                 method: "post",
-                url: `${env}/api/user/validation`,
+                maxBodyLength: Infinity,
+                url: `${env}/api/v1/auth/validation`,
                 headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
+                    "Content-Type": "application/json"
                 },
-                data: data
+                data: dataValid
             };
 
-            Axios(configIsActivated).then(response => {
+            Axios(configValid).then(response => {
                 if (response.data === "Not Actived") {
                     toast("error", "This account has not been activated, please try again");
                 } else if (response.data === "Wrong 2FA") {
@@ -80,7 +81,7 @@ const Login = () => {
                         config.AUTH.DRIVER.setItem("user", {
                             permissions: ["dashboard"]
                         });
-                        config.AUTH.DRIVER.setItem("username", username);
+                        config.AUTH.DRIVER.setItem("email", email);
                         config.AUTH.DRIVER.setItem("access_token", response.data.access_token);
                         config.AUTH.DRIVER.setItem("refresh_token", response.data.refresh_token);
                         toast("success", "Login successfull!");
@@ -110,13 +111,13 @@ const Login = () => {
             <form className="space-y-5">
                 <div>
                     <Input
-                        label={"username"}
-                        id="username"
+                        label={"Email"}
+                        id="email"
                         type="text"
-                        placeholder="Enter username"
-                        value={username}
-                        onChange={e => setUsername(e.target.value)}
-                        error={errorMessage.username}
+                        placeholder="Enter email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        error={errorMessage.email}
                     />
                 </div>
 
@@ -135,12 +136,12 @@ const Login = () => {
                 <div>
                     <Input
                         label={"Authenticator 2FA"}
-                        id="authen"
+                        id="code"
                         type="text"
                         placeholder="2FA Authentication"
-                        value={authen}
-                        onChange={e => setAuthen(e.target.value)}
-                        error={errorMessage.authen}
+                        value={code}
+                        onChange={e => setCode(e.target.value)}
+                        error={errorMessage.code}
                     />
                 </div>
 

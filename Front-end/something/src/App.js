@@ -15,6 +15,7 @@ import Register from "./pages/Register";
 import ResendActive from "./pages/ResendActive";
 import ResetPassword from "./pages/ResetPassword";
 import SearchData from "./pages/SearchData";
+import Share from "./pages/Share";
 import Swap from "./pages/Swap";
 import Transfer from "./pages/Transfer";
 import TransferExternal from "./pages/TransferExternal";
@@ -88,6 +89,14 @@ const App = () => {
                     element={
                         <Auth>
                             <Investment />
+                        </Auth>
+                    }
+                />
+                <Route
+                    path="/chia-ib"
+                    element={
+                        <Auth>
+                            <Share />
                         </Auth>
                     }
                 />

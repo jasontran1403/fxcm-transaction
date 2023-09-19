@@ -1,5 +1,4 @@
 import Axios from "axios";
-import qs from "qs";
 import React, { useState, useEffect } from "react";
 import { BiCopy } from "react-icons/bi";
 
@@ -9,7 +8,8 @@ import env from "../helpers/env";
 import AdminLayout from "../layouts/AdminLayout";
 
 const Authenticator = () => {
-    const currentUsername = config.AUTH.DRIVER.getItem("username");
+    const currentEmail = config.AUTH.DRIVER.getItem("email");
+    const currentAccessToken = config.AUTH.DRIVER.getItem("access_token");
     const [secretPhrase, setSecretPhrase] = useState("");
     const [qrImg, setQrImg] = useState("");
     const [authenCode, setAuthenCode] = useState("");
@@ -17,7 +17,10 @@ const Authenticator = () => {
 
     useEffect(() => {
         let config = {
-            url: `${env}/api/authentication/showQR/${currentUsername}`
+            method: "get",
+            maxBodyLength: Infinity,
+            url: `http://localhost:8080/api/v1/demo/showQR/${currentEmail}`,
+            headers: { Authorization: `Bearer ${currentAccessToken}` }
         };
 
         Axios(config).then(response => {
@@ -25,25 +28,28 @@ const Authenticator = () => {
             setSecretPhrase(response.data[1]);
             setQrImg(response.data[2]);
         });
-    }, [currentUsername]);
+    }, [currentEmail, currentAccessToken]);
 
     const handleEnabled = () => {
-        let data = qs.stringify({
-            username: currentUsername,
+        let data = JSON.stringify({
+            email: currentEmail,
             code: authenCode
         });
+
         let config = {
             method: "post",
-            url: `${env}/api/authentication/enabled`,
+            maxBodyLength: Infinity,
+            url: `${env}/api/v1/demo/enable`,
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${currentAccessToken}`
             },
             data: data
         };
 
         window.Swal.fire({
             title: "Are you sure?",
-            text: "You wont be able to revert this transaction!",
+            text: "You wont be able to revert this action!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -58,28 +64,31 @@ const Authenticator = () => {
                         toast("error", "Enable 2FA failed, wrong 2FA code");
                     }
                 });
-                window.Swal.fire("Confirmed!", "Your transaction has been created.", "success");
+                window.Swal.fire("Confirmed!", "2FA has been enabled.", "success");
             }
         });
     };
 
     const handleDisabled = () => {
-        let data = qs.stringify({
-            username: currentUsername,
+        let data = JSON.stringify({
+            email: currentEmail,
             code: authenCode
         });
+
         let config = {
             method: "post",
-            url: `${env}/api/authentication/disabled`,
+            maxBodyLength: Infinity,
+            url: `${env}/api/v1/demo/disable`,
             headers: {
-                "Content-Type": "application/x-www-form-urlencoded"
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${currentAccessToken}`
             },
             data: data
         };
 
         window.Swal.fire({
             title: "Are you sure?",
-            text: "You wont be able to revert this transaction!",
+            text: "You wont be able to revert this action!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3085d6",
@@ -94,7 +103,7 @@ const Authenticator = () => {
                         toast("error", "Enable 2FA failed, wrong 2FA code");
                     }
                 });
-                window.Swal.fire("Confirmed!", "Your transaction has been created.", "success");
+                window.Swal.fire("Confirmed!", "2FA has been disabled.", "success");
             }
         });
     };

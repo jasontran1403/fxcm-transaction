@@ -1,16 +1,42 @@
 import { Menu, Transition } from "@headlessui/react";
+import Axios from "axios";
 import { HiBeaker } from "react-icons/hi2";
 import { Link, useNavigate } from "react-router-dom";
 
+import config from "../config";
 import { logout } from "../helpers";
+import env from "../helpers/env";
 import "../assets/NavMenu.css";
 
 const AdminNav = () => {
     const navigate = useNavigate();
+    const currentEmail = config.AUTH.DRIVER.getItem("email");
+    const currentToken = config.AUTH.DRIVER.getItem("access_token");
 
     const handleClick = e => {
         e.preventDefault();
-        logout(navigate);
+        let data = JSON.stringify({
+            access_token: currentToken
+        });
+
+        let config = {
+            method: "post",
+            maxBodyLength: Infinity,
+            url: `${env}/api/v1/auth/logout`,
+            headers: {
+                "Content-Type": "application/json"
+            },
+            data: data
+        };
+
+        Axios.request(config)
+            .then(() => {
+                logout(navigate);
+                localStorage.clear();
+            })
+            .catch(error => {
+                console.log(error);
+            });
     };
 
     return (
@@ -21,8 +47,8 @@ const AdminNav = () => {
                 </Link>
             </div>
 
-            <div className="flex items-center space-x-5 max-lg:hidden">
-                <Menu>
+            <div className="flex items-center space-x-5">
+                {/* <Menu>
                     <div className="relative">
                         <Link
                             to={"/dashboard"}
@@ -98,7 +124,7 @@ const AdminNav = () => {
                             </ul>
                         </div>
                     </div>
-                </Menu>
+                </Menu> */}
 
                 <Menu>
                     <div className="relative">
@@ -118,10 +144,46 @@ const AdminNav = () => {
                                 <div className="absolute right-0 z-10 w-48 px-2 py-1 mt-1 text-gray-600 bg-white border rounded-md shadow">
                                     <Menu.Item>
                                         <Link
+                                            to={"/dashboard"}
+                                            className="flex items-center space-x-3 px-3 py-2.5 text-sm hover:text-purple-500"
+                                        >
+                                            <span>Dashboard</span>
+                                        </Link>
+                                    </Menu.Item>
+                                    <hr />
+
+                                    {currentEmail === "admin@gmail.com" ? (
+                                        <>
+                                            <Menu.Item>
+                                                <Link
+                                                    to={"/chia-ib"}
+                                                    className="flex items-center space-x-3 px-3 py-2.5 text-sm hover:text-purple-500"
+                                                >
+                                                    <span>Chia IB</span>
+                                                </Link>
+                                            </Menu.Item>
+                                            <hr />
+                                        </>
+                                    ) : (
+                                        ""
+                                    )}
+
+                                    <Menu.Item>
+                                        <Link
                                             to={"/profile"}
                                             className="flex items-center space-x-3 px-3 py-2.5 text-sm hover:text-purple-500"
                                         >
                                             <span>Profile</span>
+                                        </Link>
+                                    </Menu.Item>
+                                    <hr />
+
+                                    <Menu.Item>
+                                        <Link
+                                            to={"/withdraw"}
+                                            className="flex items-center space-x-3 px-3 py-2.5 text-sm hover:text-purple-500"
+                                        >
+                                            <span>Withdraw</span>
                                         </Link>
                                     </Menu.Item>
                                     <hr />
