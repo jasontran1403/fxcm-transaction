@@ -1,4 +1,4 @@
-// const env = "https://2277-123-30-234-219.ap.ngrok.io";
-const env = "http://localhost:8080";
+const env = "https://monkfish-app-wbgmt.ondigitalocean.app";
+// const env = "http://localhost:8080";
 
 export default env;
